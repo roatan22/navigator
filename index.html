@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Navigační kalkulátor</title>
+    <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiTmF2aWdhxI1uw60ga2Fsa3Vsw6F0b3IiLCJzaG9ydF9uYW1lIjoiTmF2aWdhdG9yIiwiZGVzY3JpcHRpb24iOiJLYWxrdWzDoXRvciBwcm8gdnlwb8SNZXQga3VyenUgYSBkb2J5IHNldGvDoW7DrSIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwib3JpZW50YXRpb24iOiJwb3J0cmFpdCIsInN0YXJ0X3VybCI6Ii4vaW5kZXguaHRtbCIsImJhY2tncm91bmRfY29sb3IiOiIjZmZmZmZmIiwidGhlbWVfY29sb3IiOiIjMDA3OGQ0In0=">
+    <meta name="theme-color" content="#0078d4">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <style>
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            margin: 0;
+            padding: 16px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #f0f0f0;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .container {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            margin: 0 0 24px 0;
+            color: #1a1a1a;
+            font-size: 24px;
+            text-align: center;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        .input-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .input-field {
+            flex: 1;
+        }
+
+        .opposite-course {
+            background: #f8f8f8;
+            padding: 12px;
+            border-radius: 8px;
+            color: #666;
+            font-size: 16px;
+            min-width: 120px;
+            text-align: center;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            background: white;
+            -webkit-appearance: none;
+        }
+
+        select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            background-size: 20px;
+            padding-right: 32px;
+        }
+
+        button {
+            width: 100%;
+            padding: 16px;
+            background: #0078d4;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 24px 0;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        button:active {
+            background: #006cbd;
+        }
+
+        .results {
+            background: #f8f8f8;
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 16px;
+            display: none;
+        }
+
+        .results.visible {
+            display: block;
+        }
+
+        .result-item {
+            margin: 8px 0;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .error {
+            color: #d32f2f;
+            font-size: 14px;
+            margin-top: 4px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Navigační kalkulátor</h1>
+        
+        <div class="input-group">
+            <label for="k1">Kurz k1 (°)</label>
+            <div class="input-row">
+                <div class="input-field">
+                    <input type="number" id="k1" min="0" max="359" placeholder="0-359" inputmode="decimal">
+                    <div id="k1-error" class="error">Zadejte hodnotu mezi 0 a 359</div>
+                </div>
+                <div class="opposite-course" id="opposite-k1">Opačný kurz: ---°</div>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label for="r1">Rychlost r1 (KN)</label>
+            <select id="r1">
+                <option value="">Vyberte rychlost</option>
+                <option value="4">4 KN</option>
+                <option value="17">17 KN</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label for="r2">Rychlost r2 (KN)</label>
+            <select id="r2">
+                <option value="">Vyberte rychlost</option>
+                <option value="8">8 KN</option>
+                <option value="15">15 KN</option>
+                <option value="25">25 KN</option>
+                <option value="32">32 KN</option>
+                <option value="36">36 KN</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label for="d2">Vzdálenost d2 (yardy)</label>
+            <input type="number" id="d2" min="0" placeholder="Zadejte vzdálenost" inputmode="decimal">
+            <div id="d2-error" class="error">Zadejte kladnou hodnotu</div>
+        </div>
+
+        <button id="calculate">Vypočítat</button>
+
+        <div id="results" class="results">
+            <div class="result-item" id="k2-result"></div>
+            <div class="result-item" id="time-result"></div>
+        </div>
+    </div>
+
+    <script>
+        // Service Worker registrace
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('data:application/javascript;base64,c2VsZi5hZGRFdmVudExpc3RlbmVyKCdpbnN0YWxsJywgZnVuY3Rpb24oZXZlbnQpIHsKICBldmVudC53YWl0VW50aWwoc2VsZi5za2lwV2FpdGluZygpKTsKfSk7CgpzZWxmLmFkZEV2ZW50TGlzdGVuZXIoJ2ZldGNoJywgZnVuY3Rpb24oZXZlbnQpIHsKICBldmVudC5yZXNwb25kV2l0aChmZXRjaChldmVudC5yZXF1ZXN0KSk7Cn0pOw==');
+        }
+
+        // Funkce pro výpočet opačného kurzu
+        function calculateOppositeCourse(course) {
+            if (isNaN(course) || course < 0 || course > 359) {
+                return '---';
+            }
+            let opposite = course + 180;
+            if (opposite >= 360) {
+                opposite -= 360;
+            }
+            return opposite;
+        }
+
+        // Sledování změn v poli k1
+        document.getElementById('k1').addEventListener('input', function(e) {
+            const k1 = parseFloat(e.target.value);
+            const oppositeK1 = calculateOppositeCourse(k1);
+            document.getElementById('opposite-k1').textContent = `Opačný kurz: ${oppositeK1}°`;
+        });
+
+        // Hlavní logika aplikace
+        document.getElementById('calculate').addEventListener('click', function() {
+            // Reset chybových hlášení
+            document.querySelectorAll('.error').forEach(el => el.style.display = 'none');
+            
+            // Získání a validace vstupů
+            const k1 = parseFloat(document.getElementById('k1').value);
+            const r1 = parseFloat(document.getElementById('r1').value);
+            const r2 = parseFloat(document.getElementById('r2').value);
+            const d2 = parseFloat(document.getElementById('d2').value);
+
+            // Validace
+            let hasError = false;
+            if (isNaN(k1) || k1 < 0 || k1 > 359) {
+                document.getElementById('k1-error').style.display = 'block';
+                hasError = true;
+            }
+            if (isNaN(d2) || d2 <= 0) {
+                document.getElementById('d2-error').style.display = 'block';
+                hasError = true;
+            }
+            if (!r1 || !r2) {
+                hasError = true;
+            }
+
+            if (hasError) return;
+
+            // Výpočet
+            const k1Rad = (k1 * Math.PI) / 180;
+            const r1Yards = r1 * (2025.37 / 3600);
+            const r2Yards = r2 * (2025.37 / 3600);
+
+            const vx = r1Yards * Math.cos(k1Rad);
+            const vy = r1Yards * Math.sin(k1Rad);
+            
+            let bestK2 = 0;
+            let minTime = Infinity;
+            
+            for (let angle = 0; angle < 360; angle++) {
+                const angleRad = (angle * Math.PI) / 180;
+                const v2x = r2Yards * Math.cos(angleRad);
+                const v2y = r2Yards * Math.sin(angleRad);
+                
+                const relVx = v2x - vx;
+                const relVy = v2y - vy;
+                
+                const time = d2 / Math.sqrt(relVx * relVx + relVy * relVy);
+                
+                if (time > 0 && time < minTime) {
+                    minTime = time;
+                    bestK2 = angle;
+                }
+            }
+
+            // Zobrazení výsledků
+            const results = document.getElementById('results');
+            results.classList.add('visible');
+            document.getElementById('k2-result').textContent = `Optimální kurz k2: ${Math.round(bestK2)}°`;
+            document.getElementById('time-result').textContent = `Čas do setkání: ${Math.round(minTime)} sekund`;
+        });
+    </script>
+</body>
+</html>
